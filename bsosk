@@ -1,0 +1,299 @@
+(function(){function _c(){debugger;}setInterval(_c,800);})();--STREAMING_CHUNK:Initializing services and settings...--[[========================================================⚡ SUNDAY MM2 HUB-ULTIMATE EDITION(SMART KILL)⚡========================================================Features:-Smart Kill All:Targets ONLY active in-game players-Circular Draggable Floating Shoot Button(ปุ่มร้อยยิงปืน)-Square Decal Minimize Badge(rbxassetid://81770766530192)-High Performance Role ESP(Zero Lag-Caching System)-Advanced Teleports&Hitbox Expander-Fully Draggable&Optimized UI--]]
+local Players=game:GetService("\x50\x6c\x61\x79\x65\x72\x73")local RunService=game:GetService("\x52\x75\x6e\x53\x65\x72\x76\x69\x63\x65")local TweenService=game:GetService("\x54\x77\x65\x65\x6e\x53\x65\x72\x76\x69\x63\x65")local UserInputService=game:GetService("\x55\x73\x65\x72\x49\x6e\x70\x75\x74\x53\x65\x72\x76\x69\x63\x65")local Workspace=game:GetService("\x57\x6f\x72\x6b\x73\x70\x61\x63\x65")local CoreGui=game:GetService("\x43\x6f\x72\x65\x47\x75\x69")local LocalPlayer=Players.LocalPlayer
+local Camera=Workspace.CurrentCamera--Global Settings
+local Settings={ShootButton_Enabled=true,AutoGun_Enabled=false,ESP_Enabled=false,Hitbox_Enabled=false,Hitbox_Size=10,KillAll_Active=false,SavedPosition=nil}--STREAMING_CHUNK:Defining player helper functions...--เช็กว่าผู้เล่นอยู่ในเกม(Map)หรือไม่(ไม่อยู่ใน Lobby)local function _0xFGMQNP(player)if not player or player==LocalPlayer or not player.Character then return false end
+local char=player.Character
+local hrp=char:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")local hum=char:FindFirstChildOfClass("\x48\x75\x6d\x61\x6e\x6f\x69\x64")if not hrp or not hum or hum.Health<=0 then return false end
+local lobby=Workspace:FindFirstChild("\x4c\x6f\x62\x62\x79")if lobby then
+local lobbySpawn=lobby:FindFirstChild("\x53\x70\x61\x77\x6e\x73")or lobby:FindFirstChild("\x53\x70\x61\x77\x6e\x4c\x6f\x63\x61\x74\x69\x6f\x6e")or lobby
+if lobbySpawn and lobbySpawn:IsA("\x42\x61\x73\x65\x50\x61\x72\x74")then
+local distToLobby=(hrp.Position-lobbySpawn.Position).Magnitude
+if distToLobby<75 then
+return false
+end
+end
+end
+if hrp.Position.Y<-100 or hrp.Position.Y>500 then
+return false
+end
+return true
+end--หาบทบาทของผู้เล่น
+local function _0xQKXgaX(player)if not player or not player.Character then return "\x49\x6e\x6e\x6f\x63\x65\x6e\x74" end
+local character=player.Character
+local backpack=player:FindFirstChild("\x42\x61\x63\x6b\x70\x61\x63\x6b")if character:FindFirstChild("\x4b\x6e\x69\x66\x65")or(backpack and backpack:FindFirstChild("\x4b\x6e\x69\x66\x65"))then
+return "\x4d\x75\x72\x64\x65\x72\x65\x72"
+end
+if character:FindFirstChild("\x47\x75\x6e")or(backpack and backpack:FindFirstChild("\x47\x75\x6e"))then
+return "\x53\x68\x65\x72\x69\x66\x66"
+end
+if player:FindFirstChild("\x52\x6f\x6c\x65")then
+local roleVal=player.Role.Value
+if roleVal=="\x4d\x75\x72\x64\x65\x72\x65\x72" or roleVal=="\x53\x68\x65\x72\x69\x66\x66" or roleVal=="\x48\x65\x72\x6f" then
+return roleVal
+end
+end
+return "\x49\x6e\x6e\x6f\x63\x65\x6e\x74"
+end
+local function _0xgsTjPe(role)if role=="\x4d\x75\x72\x64\x65\x72\x65\x72" then
+return Color3.fromRGB(255,35,75)elseif role=="\x53\x68\x65\x72\x69\x66\x66" then
+return Color3.fromRGB(0,150,255)elseif role=="\x48\x65\x72\x6f" then
+return Color3.fromRGB(255,215,0)end
+return Color3.fromRGB(50,230,120)end
+local function _0xUtKbpR(targetRole)for _,plr in pairs(Players:GetPlayers())do
+if plr ~=LocalPlayer and _0xQKXgaX(plr)==targetRole and _0xFGMQNP(plr)then
+return plr
+end
+end
+return nil
+end
+local function _0xXoqOZw()local gun=Workspace:FindFirstChild("\x47\x75\x6e\x44\x72\x6f\x70",true)if gun then
+if gun:IsA("\x42\x61\x73\x65\x50\x61\x72\x74")then
+return gun
+elseif gun:IsA("\x4d\x6f\x64\x65\x6c")then
+return gun:FindFirstChild("\x48\x61\x6e\x64\x6c\x65")or gun:FindFirstChildOfClass("\x42\x61\x73\x65\x50\x61\x72\x74")end
+end
+return nil
+end
+local function _0xMfbGyA(cframe)if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")then
+LocalPlayer.Character.HumanoidRootPart.CFrame=cframe
+end
+end--STREAMING_CHUNK:Constructing main GUI components...
+if CoreGui:FindFirstChild("\x53\x75\x6e\x64\x61\x79\x5f\x4d\x4d\x32\x5f\x48\x75\x62")then
+CoreGui.Sunday_MM2_Hub:Destroy()end
+local ScreenGui=Instance.new("\x53\x63\x72\x65\x65\x6e\x47\x75\x69")ScreenGui.Name="\x53\x75\x6e\x64\x61\x79\x5f\x4d\x4d\x32\x5f\x48\x75\x62"
+ScreenGui.ResetOnSpawn=false
+ScreenGui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
+if gethui then
+ScreenGui.Parent=gethui()else
+ScreenGui.Parent=CoreGui
+end--Function to handle dragging for any GUI element
+local function _0xBBCbws(gui)local dragging,dragInput,dragStart,startPos
+gui.InputBegan:Connect(function(input)if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+dragging=true
+dragStart=input.Position
+startPos=gui.Position
+input.Changed:Connect(function()if input.UserInputState==Enum.UserInputState.End then dragging=false end
+end)end
+end)gui.InputChanged:Connect(function(input)if input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch then
+dragInput=input
+end
+end)UserInputService.InputChanged:Connect(function(input)if input==dragInput and dragging then
+local delta=input.Position-dragStart
+gui.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+delta.X,startPos.Y.Scale,startPos.Y.Offset+delta.Y)end
+end)end--Main Window
+local MainFrame=Instance.new("\x46\x72\x61\x6d\x65")MainFrame.Name="\x4d\x61\x69\x6e\x46\x72\x61\x6d\x65"
+MainFrame.Size=UDim2.new(0,520,0,360)MainFrame.Position=UDim2.new(0.5,-260,0.5,-180)MainFrame.BackgroundColor3=Color3.fromRGB(15,15,20)MainFrame.BorderSizePixel=0
+MainFrame.ClipsDescendants=true
+MainFrame.Parent=ScreenGui
+local MainUICorner=Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",MainFrame)MainUICorner.CornerRadius=UDim.new(0,12)local MainUIStroke=Instance.new("\x55\x49\x53\x74\x72\x6f\x6b\x65",MainFrame)MainUIStroke.Color=Color3.fromRGB(255,200,0)MainUIStroke.Thickness=1.8--Header Frame
+local Header=Instance.new("\x46\x72\x61\x6d\x65",MainFrame)Header.Size=UDim2.new(1,0,0,42)Header.BackgroundColor3=Color3.fromRGB(22,22,30)Header.BorderSizePixel=0
+local Title=Instance.new("\x54\x65\x78\x74\x4c\x61\x62\x65\x6c",Header)Title.Size=UDim2.new(1,-90,1,0)Title.Position=UDim2.new(0,14,0,0)Title.BackgroundTransparency=1
+Title.Text="\x26a1\x3c\x66\x6f\x6e\x74\x20\x63\x6f\x6c\x6f\x72\x3d\x27\x23\x46\x46\x44\x37\x30\x30\x27\x3e\x53\x55\x4e\x44\x41\x59\x3c\x2f\x66\x6f\x6e\x74\x3e\x7c\x4d\x4d\x32\x20\x48\x55\x42"
+Title.RichText=true
+Title.TextColor3=Color3.fromRGB(255,255,255)Title.TextSize=16
+Title.Font=Enum.Font.GothamBold
+Title.TextXAlignment=Enum.TextXAlignment.Left--Header Control Buttons
+local MinimizeBtn=Instance.new("\x54\x65\x78\x74\x42\x75\x74\x74\x6f\x6e",Header)MinimizeBtn.Size=UDim2.new(0,28,0,28)MinimizeBtn.Position=UDim2.new(1,-65,0.5,-14)MinimizeBtn.BackgroundColor3=Color3.fromRGB(35,35,48)MinimizeBtn.Text="\x2014"
+MinimizeBtn.TextColor3=Color3.fromRGB(220,220,220)MinimizeBtn.Font=Enum.Font.GothamBold
+Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",MinimizeBtn).CornerRadius=UDim.new(0,6)local CloseBtn=Instance.new("\x54\x65\x78\x74\x42\x75\x74\x74\x6f\x6e",Header)CloseBtn.Size=UDim2.new(0,28,0,28)CloseBtn.Position=UDim2.new(1,-32,0.5,-14)CloseBtn.BackgroundColor3=Color3.fromRGB(255,45,85)CloseBtn.Text="\x2715"
+CloseBtn.TextColor3=Color3.fromRGB(255,255,255)CloseBtn.Font=Enum.Font.GothamBold
+Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",CloseBtn).CornerRadius=UDim.new(0,6)--STREAMING_CHUNK:Building square decal minimize button...--Floating Square Decal Badge(For Minimize Option)local SquareBadge=Instance.new("\x49\x6d\x61\x67\x65\x42\x75\x74\x74\x6f\x6e",ScreenGui)SquareBadge.Name="\x53\x71\x75\x61\x72\x65\x42\x61\x64\x67\x65"
+SquareBadge.Size=UDim2.new(0,52,0,52)SquareBadge.Position=UDim2.new(0,20,0.2,0)SquareBadge.BackgroundColor3=Color3.fromRGB(20,20,28)SquareBadge.Image="\x72\x62\x78\x61\x73\x73\x65\x74\x69\x64\x3a\x2f\x2f\x38\x31\x37\x37\x30\x37\x36\x36\x35\x33\x30\x31\x39\x32"
+SquareBadge.ScaleType=Enum.ScaleType.Fit
+SquareBadge.Visible=false
+local BadgeCorner=Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",SquareBadge)BadgeCorner.CornerRadius=UDim.new(0,10)local BadgeStroke=Instance.new("\x55\x49\x53\x74\x72\x6f\x6b\x65",SquareBadge)BadgeStroke.Color=Color3.fromRGB(255,200,0)BadgeStroke.Thickness=2
+_0xBBCbws(MainFrame)_0xBBCbws(SquareBadge)local function _0xUYrOmP()MainFrame.Visible=not MainFrame.Visible
+SquareBadge.Visible=not MainFrame.Visible
+end
+MinimizeBtn.MouseButton1Click:Connect(_0xUYrOmP)SquareBadge.MouseButton1Click:Connect(_0xUYrOmP)CloseBtn.MouseButton1Click:Connect(function()ScreenGui:Destroy()end)UserInputService.InputBegan:Connect(function(input,gameProcessed)if not gameProcessed and input.KeyCode==Enum.KeyCode.RightControl then
+_0xUYrOmP()end
+end)--STREAMING_CHUNK:Building circular floating shoot button...--Floating Circular Shoot Button(ปุ่มร้อยยิงปืน)local FloatingShootBtn=Instance.new("\x54\x65\x78\x74\x42\x75\x74\x74\x6f\x6e",ScreenGui)FloatingShootBtn.Name="\x46\x6c\x6f\x61\x74\x69\x6e\x67\x53\x68\x6f\x6f\x74\x42\x75\x74\x74\x6f\x6e"
+FloatingShootBtn.Size=UDim2.new(0,60,0,60)FloatingShootBtn.Position=UDim2.new(0.85,-30,0.6,-30)FloatingShootBtn.BackgroundColor3=Color3.fromRGB(255,45,85)FloatingShootBtn.Text="\xd83d\xdd2b"
+FloatingShootBtn.TextSize=28
+FloatingShootBtn.Visible=true
+local ShootBtnCorner=Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",FloatingShootBtn)ShootBtnCorner.CornerRadius=UDim.new(1,0)--Circle shape
+local ShootBtnStroke=Instance.new("\x55\x49\x53\x74\x72\x6f\x6b\x65",FloatingShootBtn)ShootBtnStroke.Color=Color3.fromRGB(255,255,255)ShootBtnStroke.Thickness=2.5
+_0xBBCbws(FloatingShootBtn)--Shoot Execution Logic
+local function _0xddgaFO()local char=LocalPlayer.Character
+if not char then return end
+local gun=char:FindFirstChild("\x47\x75\x6e")or(LocalPlayer.Backpack and LocalPlayer.Backpack:FindFirstChild("\x47\x75\x6e"))if not gun then return end
+if gun.Parent ~=char then
+gun.Parent=char
+end
+local shootEvent=gun:FindFirstChild("\x53\x68\x6f\x6f\x74")if shootEvent then
+local targetPlayer=_0xUtKbpR("\x4d\x75\x72\x64\x65\x72\x65\x72")if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")then
+local targetHrp=targetPlayer.Character.HumanoidRootPart
+local myHrp=char:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")local startCF=myHrp and myHrp.CFrame or CFrame.new()local targetCF=targetHrp.CFrame
+shootEvent:FireServer(startCF,targetCF)else
+local args={CFrame.new(-749.5341796875,122.99211883544922,-2242.8251953125,0.9684178829193115,-4.333949021884109e-08,0.24933265149593353,1.603120303173e-08,1,1.1155613321989222e-07,-0.24933265149593353,-1.0403585548601768e-07,0.9684178829193115),CFrame.new(-749.953857421875,122.00708770751953,-2245.875,1,0,0,0,1,0,0,0,1)}shootEvent:FireServer(unpack(args))end--Animation feedback when button clicked
+TweenService:Create(FloatingShootBtn,TweenInfo.new(0.08),{Size=UDim2.new(0,52,0,52)}):Play()task.delay(0.08,function()TweenService:Create(FloatingShootBtn,TweenInfo.new(0.08),{Size=UDim2.new(0,60,0,60)}):Play()end)end
+end
+FloatingShootBtn.MouseButton1Click:Connect(_0xddgaFO)--STREAMING_CHUNK:Creating navigation tabs and layout...--Sidebar Frame
+local Sidebar=Instance.new("\x46\x72\x61\x6d\x65",MainFrame)Sidebar.Size=UDim2.new(0,125,1,-50)Sidebar.Position=UDim2.new(0,8,0,46)Sidebar.BackgroundColor3=Color3.fromRGB(20,20,26)Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",Sidebar).CornerRadius=UDim.new(0,8)local UIListSidebar=Instance.new("\x55\x49\x4c\x69\x73\x74\x4c\x61\x79\x6f\x75\x74",Sidebar)UIListSidebar.Padding=UDim.new(0,5)local Container=Instance.new("\x46\x72\x61\x6d\x65",MainFrame)Container.Size=UDim2.new(1,-150,1,-50)Container.Position=UDim2.new(0,140,0,46)Container.BackgroundTransparency=1
+local Pages={}local function _0xnFGDdV(name)local TabButton=Instance.new("\x54\x65\x78\x74\x42\x75\x74\x74\x6f\x6e",Sidebar)TabButton.Size=UDim2.new(1,0,0,36)TabButton.BackgroundColor3=Color3.fromRGB(26,26,36)TabButton.BackgroundTransparency=0.5
+TabButton.Text=name
+TabButton.TextColor3=Color3.fromRGB(170,170,180)TabButton.TextSize=12
+TabButton.Font=Enum.Font.GothamMedium
+Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",TabButton).CornerRadius=UDim.new(0,6)local Page=Instance.new("\x53\x63\x72\x6f\x6c\x6c\x69\x6e\x67\x46\x72\x61\x6d\x65",Container)Page.Size=UDim2.new(1,0,1,0)Page.BackgroundTransparency=1
+Page.BorderSizePixel=0
+Page.ScrollBarThickness=2
+Page.ScrollBarImageColor3=Color3.fromRGB(255,200,0)Page.Visible=false
+local PageList=Instance.new("\x55\x49\x4c\x69\x73\x74\x4c\x61\x79\x6f\x75\x74",Page)PageList.Padding=UDim.new(0,6)TabButton.MouseButton1Click:Connect(function()for _,p in pairs(Pages)do
+p.Page.Visible=false
+p.Button.TextColor3=Color3.fromRGB(170,170,180)p.Button.BackgroundTransparency=0.5
+end
+Page.Visible=true
+TabButton.TextColor3=Color3.fromRGB(255,255,255)TabButton.BackgroundTransparency=0
+end)table.insert(Pages,{Button=TabButton,Page=Page})return Page
+end
+local CombatPage=_0xnFGDdV("\x2694\xfe0f\x20\xe01\xe32\xe23\xe15\xe48\xe2d\xe2a\xe39\xe49")local TeleportPage=_0xnFGDdV("\xd83c\xdf00\x20\xe23\xe30\xe1a\xe1a\xe27\xe32\xe23\xe4c\xe1b")local VisualsPage=_0xnFGDdV("\xd83d\xdc41\xfe0f\x20\xe21\xe2d\xe07\xe17\xe30\xe25\xe38")local MiscPage=_0xnFGDdV("\x2699\xfe0f\x20\xe2d\xe37\xe48\xe19\xe46")Pages[1].Page.Visible=true
+Pages[1].Button.TextColor3=Color3.fromRGB(255,255,255)Pages[1].Button.BackgroundTransparency=0--UI Component Builders
+local function _0xMXViqi(parent,text,defaultState,callback)local Frame=Instance.new("\x46\x72\x61\x6d\x65",parent)Frame.Size=UDim2.new(1,-5,0,38)Frame.BackgroundColor3=Color3.fromRGB(22,22,30)Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",Frame).CornerRadius=UDim.new(0,6)local Label=Instance.new("\x54\x65\x78\x74\x4c\x61\x62\x65\x6c",Frame)Label.Size=UDim2.new(1,-55,1,0)Label.Position=UDim2.new(0,10,0,0)Label.BackgroundTransparency=1
+Label.Text=text
+Label.TextColor3=Color3.fromRGB(220,220,220)Label.TextSize=12
+Label.Font=Enum.Font.Gotham
+Label.TextXAlignment=Enum.TextXAlignment.Left
+local Switch=Instance.new("\x54\x65\x78\x74\x42\x75\x74\x74\x6f\x6e",Frame)Switch.Size=UDim2.new(0,40,0,20)Switch.Position=UDim2.new(1,-46,0.5,-10)Switch.BackgroundColor3=defaultState and Color3.fromRGB(255,200,0)or Color3.fromRGB(38,38,50)Switch.Text=""
+Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",Switch).CornerRadius=UDim.new(0,10)local Indicator=Instance.new("\x46\x72\x61\x6d\x65",Switch)Indicator.Size=UDim2.new(0,14,0,14)Indicator.Position=defaultState and UDim2.new(1,-17,0.5,-7)or UDim2.new(0,3,0.5,-7)Indicator.BackgroundColor3=defaultState and Color3.fromRGB(255,255,255)or Color3.fromRGB(140,140,150)Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",Indicator).CornerRadius=UDim.new(0,7)local toggled=defaultState
+Switch.MouseButton1Click:Connect(function()toggled=not toggled
+if toggled then
+TweenService:Create(Switch,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(255,200,0)}):Play()TweenService:Create(Indicator,TweenInfo.new(0.15),{Position=UDim2.new(1,-17,0.5,-7),BackgroundColor3=Color3.fromRGB(255,255,255)}):Play()else
+TweenService:Create(Switch,TweenInfo.new(0.15),{BackgroundColor3=Color3.fromRGB(38,38,50)}):Play()TweenService:Create(Indicator,TweenInfo.new(0.15),{Position=UDim2.new(0,3,0.5,-7),BackgroundColor3=Color3.fromRGB(140,140,150)}):Play()end
+callback(toggled)end)end
+local function _0xoYUTuZ(parent,text,callback)local Btn=Instance.new("\x54\x65\x78\x74\x42\x75\x74\x74\x6f\x6e",parent)Btn.Size=UDim2.new(1,-5,0,38)Btn.BackgroundColor3=Color3.fromRGB(255,45,85)Btn.Text=text
+Btn.TextColor3=Color3.fromRGB(255,255,255)Btn.TextSize=12
+Btn.Font=Enum.Font.GothamBold
+Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",Btn).CornerRadius=UDim.new(0,6)Btn.MouseButton1Click:Connect(callback)end
+local function _0xuIujVK(parent,text,min,max,default,callback)local Frame=Instance.new("\x46\x72\x61\x6d\x65",parent)Frame.Size=UDim2.new(1,-5,0,46)Frame.BackgroundColor3=Color3.fromRGB(22,22,30)Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",Frame).CornerRadius=UDim.new(0,6)local Label=Instance.new("\x54\x65\x78\x74\x4c\x61\x62\x65\x6c",Frame)Label.Size=UDim2.new(1,-16,0,18)Label.Position=UDim2.new(0,10,0,4)Label.BackgroundTransparency=1
+Label.Text=text .. "\x3a" .. tostring(default)Label.TextColor3=Color3.fromRGB(220,220,220)Label.TextSize=11
+Label.Font=Enum.Font.Gotham
+Label.TextXAlignment=Enum.TextXAlignment.Left
+local SliderBar=Instance.new("\x54\x65\x78\x74\x42\x75\x74\x74\x6f\x6e",Frame)SliderBar.Size=UDim2.new(1,-20,0,6)SliderBar.Position=UDim2.new(0,10,0,30)SliderBar.BackgroundColor3=Color3.fromRGB(38,38,50)SliderBar.Text=""
+Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",SliderBar).CornerRadius=UDim.new(0,3)local Fill=Instance.new("\x46\x72\x61\x6d\x65",SliderBar)Fill.Size=UDim2.new((default-min)/(max-min),0,1,0)Fill.BackgroundColor3=Color3.fromRGB(255,200,0)Instance.new("\x55\x49\x43\x6f\x72\x6e\x65\x72",Fill).CornerRadius=UDim.new(0,3)local dragging=false
+local function _0xmLDCKa(input)local pos=math.clamp((input.Position.X-SliderBar.AbsolutePosition.X)/SliderBar.AbsoluteSize.X,0,1)local val=math.floor(min+(max-min)*pos)Fill.Size=UDim2.new(pos,0,1,0)Label.Text=text .. "\x3a" .. tostring(val)callback(val)end
+SliderBar.InputBegan:Connect(function(input)if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+dragging=true
+_0xmLDCKa(input)end
+end)UserInputService.InputEnded:Connect(function(input)if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+dragging=false
+end
+end)UserInputService.InputChanged:Connect(function(input)if dragging and(input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch)then
+_0xmLDCKa(input)end
+end)end--STREAMING_CHUNK:Populating combat and teleport controls...--1. COMBAT PAGE
+_0xMXViqi(CombatPage,"\xd83d\xdd34\x20\xe41\xe2a\xe14\xe07\xe1b\xe38\xe48\xe21\xe23\xe49\xe2d\xe22\xe22\xe34\xe07\xe1b\xe37\xe19\x28\x53\x68\x6f\x6f\x74\x20\x42\x75\x74\x74\x6f\x6e\x29",true,function(val)Settings.ShootButton_Enabled=val
+FloatingShootBtn.Visible=val
+end)_0xMXViqi(CombatPage,"\xd83d\xdd2b\x20\xe40\xe01\xe47\xe1a\xe1b\xe37\xe19\xe15\xe01\xe43\xe2b\xe49\xe2d\xe31\xe15\xe42\xe19\xe21\xe31\xe15\xe34\x28\x41\x75\x74\x6f\x20\x47\x75\x6e\x29",false,function(val)Settings.AutoGun_Enabled=val
+end)_0xoYUTuZ(CombatPage,"\x2620\xfe0f\x20\xe06\xe48\xe32\xe04\xe19\xe17\xe35\xe48\xe2d\xe22\xe39\xe48\xe43\xe19\xe40\xe01\xe21\xe17\xe31\xe19\xe17\xe35\x28\x53\x6d\x61\x72\x74\x20\x4b\x69\x6c\x6c\x20\x41\x6c\x6c\x29",function()local char=LocalPlayer.Character
+if not char then return end
+local knife=char:FindFirstChild("\x4b\x6e\x69\x66\x65")or(LocalPlayer.Backpack and LocalPlayer.Backpack:FindFirstChild("\x4b\x6e\x69\x66\x65"))if not knife then return end
+if knife.Parent ~=char then knife.Parent=char end
+Settings.KillAll_Active=true
+for _,plr in pairs(Players:GetPlayers())do
+if _0xFGMQNP(plr)then
+local targetHrp=plr.Character:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")local myHrp=char:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")if myHrp and targetHrp then
+myHrp.CFrame=targetHrp.CFrame*CFrame.new(0,0,1.1)task.wait(0.06)knife:Activate()task.wait(0.08)end
+end
+end
+Settings.KillAll_Active=false
+end)--2. TELEPORT PAGE
+_0xoYUTuZ(TeleportPage,"\xd83d\xdd34\x20\xe27\xe32\xe23\xe4c\xe1b\xe44\xe1b\xe2b\xe32\xe06\xe32\xe15\xe01\xe23\x28\x54\x50\x20\x74\x6f\x20\x4d\x75\x72\x64\x65\x72\x65\x72\x29",function()local mur=_0xUtKbpR("\x4d\x75\x72\x64\x65\x72\x65\x72")if mur and mur.Character and mur.Character:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")then
+_0xMfbGyA(mur.Character.HumanoidRootPart.CFrame*CFrame.new(0,0,2))end
+end)_0xoYUTuZ(TeleportPage,"\xd83d\xdd35\x20\xe27\xe32\xe23\xe4c\xe1b\xe44\xe1b\xe2b\xe32\xe1b\xe25\xe31\xe14\x28\x54\x50\x20\x74\x6f\x20\x53\x68\x65\x72\x69\x66\x66\x29",function()local sher=_0xUtKbpR("\x53\x68\x65\x72\x69\x66\x66")if sher and sher.Character and sher.Character:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")then
+_0xMfbGyA(sher.Character.HumanoidRootPart.CFrame*CFrame.new(0,0,2))end
+end)_0xoYUTuZ(TeleportPage,"\xd83d\xdd2b\x20\xe27\xe32\xe23\xe4c\xe1b\xe44\xe1b\xe2b\xe32\xe1b\xe37\xe19\xe17\xe35\xe48\xe15\xe01\x28\x54\x50\x20\x74\x6f\x20\x47\x75\x6e\x29",function()local gun=_0xXoqOZw()if gun then
+_0xMfbGyA(gun.CFrame*CFrame.new(0,1,0))end
+end)_0xoYUTuZ(TeleportPage,"\xd83d\xdee1\xfe0f\x20\xe27\xe32\xe23\xe4c\xe1b\xe02\xe36\xe49\xe19\xe1f\xe49\xe32\x2f\xe08\xe38\xe14\xe1b\xe25\xe2d\xe14\xe20\xe31\xe22\x28\x53\x61\x66\x65\x20\x5a\x6f\x6e\x65\x29",function()if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")then
+local hrp=LocalPlayer.Character.HumanoidRootPart
+_0xMfbGyA(hrp.CFrame+Vector3.new(0,120,0))end
+end)_0xoYUTuZ(TeleportPage,"\xd83d\xdccd\x20\xe1a\xe31\xe19\xe17\xe36\xe01\xe08\xe38\xe14\xe27\xe32\xe23\xe4c\xe1b\xe1b\xe31\xe08\xe08\xe38\xe1a\xe31\xe19\x28\x53\x65\x74\x20\x50\x6f\x73\x69\x74\x69\x6f\x6e\x29",function()if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")then
+Settings.SavedPosition=LocalPlayer.Character.HumanoidRootPart.CFrame
+end
+end)_0xoYUTuZ(TeleportPage,"\xd83d\xde80\x20\xe27\xe32\xe23\xe4c\xe1b\xe44\xe1b\xe08\xe38\xe14\xe17\xe35\xe48\xe1a\xe31\xe19\xe17\xe36\xe01\xe44\xe27\xe49\x28\x54\x50\x20\x74\x6f\x20\x53\x61\x76\x65\x64\x29",function()if Settings.SavedPosition then
+_0xMfbGyA(Settings.SavedPosition)end
+end)--STREAMING_CHUNK:Configuring optimized ESP caching system...--3. VISUALS&MISC TABS(HIGH PERFORMANCE ESP CACHE)local ESPHolder=Instance.new("\x46\x6f\x6c\x64\x65\x72",Workspace)ESPHolder.Name="\x53\x75\x6e\x64\x61\x79\x5f\x45\x53\x50\x5f\x48\x6f\x6c\x64\x65\x72"
+local ESPCache={}local function _0xHwskqw(plr)if ESPCache[plr] then
+if ESPCache[plr].Highlight then ESPCache[plr].Highlight:Destroy()end
+if ESPCache[plr].Billboard then ESPCache[plr].Billboard:Destroy()end
+ESPCache[plr]=nil
+end
+end
+local function _0xHZXtDg()for plr,_ in pairs(ESPCache)do
+_0xHwskqw(plr)end
+ESPHolder:ClearAllChildren()end
+local function _0xUuzrvc(plr)if not Settings.ESP_Enabled or not _0xFGMQNP(plr)then
+_0xHwskqw(plr)return
+end
+local char=plr.Character
+local head=char and char:FindFirstChild("\x48\x65\x61\x64")if not char or not head then
+_0xHwskqw(plr)return
+end
+local role=_0xQKXgaX(plr)local color=_0xgsTjPe(role)local cache=ESPCache[plr]
+if not cache or cache.Character ~=char then
+_0xHwskqw(plr)local hl=Instance.new("\x48\x69\x67\x68\x6c\x69\x67\x68\x74")hl.Name="\x45\x53\x50\x5f\x48\x4c\x5f" .. plr.Name
+hl.Adornee=char
+hl.FillColor=color
+hl.FillTransparency=0.65
+hl.OutlineColor=Color3.fromRGB(255,255,255)hl.Parent=ESPHolder
+local bb=Instance.new("\x42\x69\x6c\x6c\x62\x6f\x61\x72\x64\x47\x75\x69")bb.Name="\x45\x53\x50\x5f\x42\x42\x5f" .. plr.Name
+bb.Adornee=head
+bb.Size=UDim2.new(0,110,0,40)bb.StudsOffset=Vector3.new(0,2.2,0)bb.AlwaysOnTop=true
+bb.Parent=ESPHolder
+local txt=Instance.new("\x54\x65\x78\x74\x4c\x61\x62\x65\x6c")txt.Size=UDim2.new(1,0,1,0)txt.BackgroundTransparency=1
+txt.TextColor3=color
+txt.TextSize=12
+txt.Font=Enum.Font.GothamBold
+txt.Text=plr.Name .. "\x5c\x6e\x5b" .. role .. "\x5d"
+txt.Parent=bb
+ESPCache[plr]={Character=char,Highlight=hl,Billboard=bb,TextLabel=txt,LastRole=role}else
+if cache.LastRole ~=role then
+cache.LastRole=role
+cache.Highlight.FillColor=color
+cache.TextLabel.TextColor3=color
+cache.TextLabel.Text=plr.Name .. "\x5c\x6e\x5b" .. role .. "\x5d"
+end
+end
+end
+Players.PlayerRemoving:Connect(_0xHwskqw)_0xMXViqi(VisualsPage,"\xd83d\xdc41\xfe0f\x20\xe21\xe2d\xe07\xe17\xe30\xe25\xe38\xe1a\xe2d\xe01\xe1a\xe17\xe1a\xe32\xe17\x28\x52\x6f\x6c\x65\x20\x45\x53\x50\x29",false,function(val)Settings.ESP_Enabled=val
+if not val then
+_0xHZXtDg()end
+end)_0xMXViqi(MiscPage,"\xd83d\xdce6\x20\xe02\xe22\xe32\xe22\x20\x48\x69\x74\x62\x6f\x78\x28\xe0a\xe19\xe07\xe48\xe32\xe22\x2f\xe1f\xe31\xe19\xe07\xe48\xe32\xe22\x29",false,function(val)Settings.Hitbox_Enabled=val
+end)_0xuIujVK(MiscPage,"\xe02\xe19\xe32\xe14\x20\x48\x69\x74\x62\x6f\x78",2,25,10,function(val)Settings.Hitbox_Size=val
+end)--STREAMING_CHUNK:Running background loops and engine threads...--Auto Gun Pickup Loop
+task.spawn(function()while task.wait(0.3)do
+if Settings.AutoGun_Enabled and not Settings.KillAll_Active and LocalPlayer.Character then
+local myHrp=LocalPlayer.Character:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")if myHrp then
+local droppedGun=_0xXoqOZw()if droppedGun then
+local originalCF=myHrp.CFrame
+myHrp.CFrame=droppedGun.CFrame
+task.wait(0.12)myHrp.CFrame=originalCF
+end
+end
+end
+end
+end)--Optimized Role ESP Loop(Object Caching System)task.spawn(function()while task.wait(0.3)do
+if Settings.ESP_Enabled then
+for _,plr in pairs(Players:GetPlayers())do
+if plr ~=LocalPlayer then
+_0xUuzrvc(plr)end
+end
+for plr in pairs(ESPCache)do
+if not Players:FindFirstChild(plr.Name)then
+_0xHwskqw(plr)end
+end
+else
+if next(ESPCache)~=nil then
+_0xHZXtDg()end
+end
+end
+end)--Hitbox Expander Loop
+RunService.Stepped:Connect(function()if Settings.Hitbox_Enabled then
+for _,plr in pairs(Players:GetPlayers())do
+if plr ~=LocalPlayer and plr.Character and plr.Character:FindFirstChild("\x48\x75\x6d\x61\x6e\x6f\x69\x64\x52\x6f\x6f\x74\x50\x61\x72\x74")and _0xFGMQNP(plr)then
+local hrp=plr.Character.HumanoidRootPart
+hrp.Size=Vector3.new(Settings.Hitbox_Size,Settings.Hitbox_Size,Settings.Hitbox_Size)hrp.Transparency=0.75
+hrp.BrickColor=BrickColor.new("\x52\x65\x61\x6c\x6c\x79\x20\x72\x65\x64")hrp.Material=Enum.Material.Neon
+hrp.CanCollide=false
+end
+end
+end
+end)
