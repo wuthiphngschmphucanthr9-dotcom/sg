@@ -1,0 +1,355 @@
+-- STREAMING_CHUNK:Loading user interface framework...
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/x2zu/OPEN-SOURCE-UI-ROBLOX/refs/heads/main/X2ZU%20UI%20ROBLOX%20OPEN%20SOURCE/DummyUi-leak-by-x2zu/fetching-main/Tools/Framework.luau"))()
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+-- STREAMING_CHUNK:Creating main window and configuration...
+local Window = Library:Window({
+Title = "x2zu [ Stellar ]",
+Desc = "x2zu on top",
+Icon = 105059922903197,
+Theme = "Dark",
+Config = {
+Keybind = Enum.KeyCode.LeftControl,
+Size = UDim2.new(0, 500, 0, 400)
+},
+CloseUIButton = {
+Enabled = true,
+Text = "x2zu"
+}
+})
+-- Sidebar Vertical Separator
+local SidebarLine = Instance.new("Frame")
+SidebarLine.Size = UDim2.new(0, 1, 1, 0)
+SidebarLine.Position = UDim2.new(0, 140, 0, 0)
+SidebarLine.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SidebarLine.BorderSizePixel = 0
+SidebarLine.ZIndex = 5
+SidebarLine.Name = "SidebarLine"
+pcall(function()
+SidebarLine.Parent = game:GetService("CoreGui")
+end)
+-- STREAMING_CHUNK:Defining gun remote firing and teleport functionality...
+local function FireGunRemote()
+local char = LocalPlayer.Character
+if not char then return end
+local gun = char:FindFirstChild("Gun") or char:FindFirstChildOfClass("Tool")
+if gun and gun:FindFirstChild("Shoot") then
+local args = {
+CFrame.new(-749.5341796875, 122.99211883544922, -2242.8251953125, 0.9684178829193115, -4.333949021884109e-08, 0.24933265149593353, 1.603120303173e-08, 1, 1.1155613321989222e-07, -0.24933265149593353, -1.0403585548601768e-07, 0.9684178829193115),
+CFrame.new(-749.953857421875, 122.00708770751953, -2245.875, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+}
+gun.Shoot:FireServer(unpack(args))
+Window:Notify({
+Title = "Gun Fired",
+Desc = "ยิงปืนเรียบร้อยแล้ว!",
+Time = 2
+})
+else
+Window:Notify({
+Title = "Gun System",
+Desc = "ไม่พบปืนในตัวละคร หรือปืนไม่มี Remote Shoot!",
+Time = 3
+})
+end
+end
+local function TeleportToGunAndBack()
+local char = LocalPlayer.Character
+if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+local hrp = char.HumanoidRootPart
+local originalCFrame = hrp.CFrame
+-- ค้นหาปืนที่ตกอยู่ใน Workspace
+local targetGun = nil
+for _, v in ipairs(workspace:GetDescendants()) do
+if (v:IsA("Tool") and (v.Name:lower():find("gun") or v.Name == "GunDrop" or v.Name == "Gun")) or
+(v:IsA("BasePart") and (v.Name == "GunDrop" or v.Name == "Gun")) then
+targetGun = v
+break
+end
+end
+if targetGun then
+local targetPart = targetGun:IsA("BasePart") and targetGun or targetGun:FindFirstChild("Handle") or targetGun:FindFirstChildWhichIsA("BasePart")
+if targetPart then
+hrp.CFrame = targetPart.CFrame
+task.wait(0.3)
+hrp.CFrame = originalCFrame
+Window:Notify({
+Title = "Teleport Gun",
+Desc = "วาปไปเก็บปืนและกลับมาตำแหน่งเดิมเรียบร้อย!",
+Time = 3
+})
+else
+Window:Notify({
+Title = "Teleport Gun",
+Desc = "ไม่พบตำแหน่งของปืนที่ตกอยู่",
+Time = 3
+})
+end
+else
+Window:Notify({
+Title = "Teleport Gun",
+Desc = "ไม่พบปืนที่ตกอยู่ในแมพขณะนี้!",
+Time = 3
+})
+end
+end
+-- STREAMING_CHUNK:Creating floating draggable gun button UI...
+local function CreateFloatingGunButton()
+local guiName = "StellarFloatingGunUI"
+local existing = game:GetService("CoreGui"):FindFirstChild(guiName) or LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild(guiName)
+if existing then existing:Destroy() end
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = guiName
+screenGui.ResetOnSpawn = false
+pcall(function()
+screenGui.Parent = game:GetService("CoreGui")
+end)
+if not screenGui.Parent then
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+end
+local floatBtn = Instance.new("TextButton")
+floatBtn.Name = "GunButton"
+floatBtn.Size = UDim2.new(0, 55, 0, 55)
+floatBtn.Position = UDim2.new(0.85, 0, 0.4, 0)
+floatBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
+floatBtn.BorderSizePixel = 0
+floatBtn.Text = "🔫"
+floatBtn.TextSize = 28
+floatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+floatBtn.Active = true
+floatBtn.Parent = screenGui
+-- UICorner ทำเป็นวงกลม
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim2.new(1, 0)
+uiCorner.Parent = floatBtn
+-- UIStroke เพิ่มเส้นขอบสวยงาม
+local uiStroke = Instance.new("UIStroke")
+uiStroke.Thickness = 2
+uiStroke.Color = Color3.fromRGB(255, 80, 80)
+uiStroke.Parent = floatBtn
+-- ระบบลาก UI (Draggable system)
+local dragging = false
+local dragInput, dragStart, startPos
+local function updateInput(input)
+local delta = input.Position - dragStart
+floatBtn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+floatBtn.InputBegan:Connect(function(input)
+if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+dragging = true
+dragStart = input.Position
+startPos = floatBtn.Position
+input.Changed:Connect(function()
+if input.UserInputState == Enum.UserInputState.End then
+dragging = false
+end
+end)
+end
+end)
+floatBtn.InputChanged:Connect(function(input)
+if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+dragInput = input
+end
+end)
+UserInputService.InputChanged:Connect(function(input)
+if input == dragInput and dragging then
+updateInput(input)
+end
+end)
+-- เมื่อกดปุ่มรูปปืน จะรันโค้ดยิงปืน
+floatBtn.MouseButton1Click:Connect(function()
+FireGunRemote()
+end)
+end
+-- สร้างปุ่มลอยทันทีเมื่อรันสคริปต์
+CreateFloatingGunButton()
+-- STREAMING_CHUNK:Setting up player role viewing and ESP system...
+local RoleESPEnabled = false
+local function GetPlayerRole(player)
+if not player or not player.Character then return "Innocent", Color3.fromRGB(100, 255, 100) end
+local char = player.Character
+local backpack = player:FindFirstChild("Backpack")
+-- เช็คการถือปืน หรือมีด
+local hasKnife = (char:FindFirstChild("Knife") or (backpack and backpack:FindFirstChild("Knife")) or char:FindFirstChild("Blade"))
+local hasGun = (char:FindFirstChild("Gun") or (backpack and backpack:FindFirstChild("Gun")) or char:FindFirstChild("Revolver"))
+if hasKnife then
+return "Murderer 🔪", Color3.fromRGB(255, 50, 50)
+elseif hasGun then
+return "Sheriff 🔫", Color3.fromRGB(50, 150, 255)
+end
+-- เช็คจากค่า Value ในตัวผู้เล่น (ถ้ามี)
+if player:FindFirstChild("Role") then
+return tostring(player.Role.Value), Color3.fromRGB(255, 255, 255)
+end
+return "Innocent 😇", Color3.fromRGB(100, 255, 100)
+end
+local function UpdateRoleESP()
+for _, player in ipairs(Players:GetPlayers()) do
+if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+local head = player.Character.Head
+local existingTag = head:FindFirstChild("RoleTagESP")
+if RoleESPEnabled then
+local roleName, color = GetPlayerRole(player)
+if not existingTag then
+local bb = Instance.new("BillboardGui")
+bb.Name = "RoleTagESP"
+bb.Adornee = head
+bb.Size = UDim2.new(0, 120, 0, 40)
+bb.StudsOffset = Vector3.new(0, 2.5, 0)
+bb.AlwaysOnTop = true
+local txt = Instance.new("TextLabel")
+txt.Name = "RoleLabel"
+txt.Size = UDim2.new(1, 0, 1, 0)
+txt.BackgroundTransparency = 1
+txt.Text = player.DisplayName .. "\n[" .. roleName .. "]"
+txt.TextColor3 = color
+txt.TextStrokeTransparency = 0.2
+txt.TextSize = 14
+txt.Font = Enum.Font.SourceSansBold
+txt.Parent = bb
+bb.Parent = head
+else
+local roleName, color = GetPlayerRole(player)
+existingTag.RoleLabel.Text = player.DisplayName .. "\n[" .. roleName .. "]"
+existingTag.RoleLabel.TextColor3 = color
+end
+else
+if existingTag then
+existingTag:Destroy()
+end
+end
+end
+end
+end
+-- ลูปอัปเดตบทบาทผู้เล่นอย่างต่อเนื่อง
+task.spawn(function()
+while task.wait(1) do
+if RoleESPEnabled then
+pcall(UpdateRoleESP)
+end
+end
+end)
+-- STREAMING_CHUNK:Building main UI tab components...
+local Tab = Window:Tab({Title = "Main", Icon = "star"}) do
+Tab:Section({Title = "Gun Features & Combat"})
+-- ปุ่มยิงปืนหลัก
+Tab:Button({
+Title = "Shoot Gun (Fire Remote)",
+Desc = "รันโค้ดยิงปืนที่คุณตั้งค่าไว้",
+Callback = function()
+FireGunRemote()
+end
+})
+-- ปุ่มวาปไปเอาปืนแล้วกลับมาที่เดิม
+Tab:Button({
+Title = "วาปไปเอาปืนแล้วกลับที่เดิม",
+Desc = "วาปไปเก็บปืนที่ตกอยู่ในแมพและวาปกลับมาตำแหน่งเดิม",
+Callback = function()
+TeleportToGunAndBack()
+end
+})
+-- ปุ่มเปิด/ปิดสร้างปุ่มลอยวงกลมใหม่
+Tab:Button({
+Title = "รีโหลดปุ่มลอยรูปปืน (Floating Button)",
+Desc = "สร้างปุ่มลอยรูปปืนแบบวงกลมที่ลากได้ใหม่",
+Callback = function()
+CreateFloatingGunButton()
+Window:Notify({
+Title = "Floating Button",
+Desc = "สร้างปุ่มลอยรูปปืนเรียบร้อย!",
+Time = 3
+})
+end
+})
+Tab:Section({Title = "Basic Controls"})
+Tab:Toggle({
+Title = "Enable Feature",
+Desc = "Toggle to enable or disable the feature",
+Value = false,
+Callback = function(v)
+print("Toggle:", v)
+end
+})
+Tab:Slider({
+Title = "Set Speed",
+Min = 0,
+Max = 100,
+Rounding = 0,
+Value = 25,
+Callback = function(val)
+print("Slider:", val)
+if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+LocalPlayer.Character.Humanoid.WalkSpeed = val
+end
+end
+})
+end
+-- STREAMING_CHUNK:Building role viewer and ESP tab...
+local RoleTab = Window:Tab({Title = "Role Viewer", Icon = "eye"}) do
+RoleTab:Section({Title = "ระบบมองบทบาทผู้เล่น (Role ESP)"})
+RoleTab:Toggle({
+Title = "เปิดระบบมองบทบาทผู้เล่น (ESP)",
+Desc = "แสดงชื่อและบทบาท (Murderer / Sheriff / Innocent) บนหัวผู้เล่นทุกคน",
+Value = false,
+Callback = function(state)
+RoleESPEnabled = state
+if not state then
+UpdateRoleESP() -- ล้างป้ายเมื่อปิด
+end
+Window:Notify({
+Title = "Role ESP",
+Desc = state and "เปิดระบบมองบทบาทแล้ว!" or "ปิดระบบมองบทบาทแล้ว!",
+Time = 3
+})
+end
+})
+RoleTab:Button({
+Title = "อัปเดตบทบาทผู้เล่นทันที",
+Desc = "สแกนตรวจสอบบทบาทของผู้เล่นในห้องทั้งหมด",
+Callback = function()
+UpdateRoleESP()
+Window:Notify({
+Title = "Role Scanner",
+Desc = "อัปเดตข้อมูลบทบาทผู้เล่นเรียบร้อย!",
+Time = 2
+})
+end
+})
+end
+Window:Line()
+-- STREAMING_CHUNK:Building extra and settings tabs...
+local Extra = Window:Tab({Title = "Extra", Icon = "tag"}) do
+Extra:Section({Title = "About"})
+Extra:Button({
+Title = "Show Message",
+Desc = "Display a popup",
+Callback = function()
+Window:Notify({
+Title = "Fluent UI",
+Desc = "Everything works fine!",
+Time = 3
+})
+end
+})
+end
+Window:Line()
+local SettingsTab = Window:Tab({Title = "Settings", Icon = "wrench"}) do
+SettingsTab:Section({Title = "Config"})
+SettingsTab:Button({
+Title = "Show Message",
+Desc = "Display a popup",
+Callback = function()
+Window:Notify({
+Title = "Fluent UI",
+Desc = "Everything works fine!",
+Time = 3
+})
+end
+})
+end
+-- STREAMING_CHUNK:Displaying final notification...
+Window:Notify({
+Title = "x2zu [ Stellar ]",
+Desc = "โหลดระบบปุ่มลอย, วาปเอาปืน และระบบมองบทบาทเสร็จสิ้น!",
+Time = 4
+})
